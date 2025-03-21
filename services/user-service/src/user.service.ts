@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Prisma, User } from '../prisma/generated/postgres';
+import { MongoService } from './mongodb.service';
 import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mongo: MongoService,
+  ) {}
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
@@ -33,5 +37,11 @@ export class UserService {
 
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({ data });
+  }
+
+  async eventUserCreated(): Promise<void> {
+    await this.mongo.log.create({
+      data: { message: 'User created', createdAt: new Date() },
+    });
   }
 }

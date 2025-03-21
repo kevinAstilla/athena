@@ -14,7 +14,8 @@ export class AppController {
   @EventPattern('user-created')
   async handleUserCreated(@Payload() createUserDto: CreateUserDto) {
     try {
-      await this.userService.createUser(createUserDto);
+      // await this.userService.createUser(createUserDto);
+      await this.userService.eventUserCreated();
     } catch (error) {
       console.error(error);
     }
